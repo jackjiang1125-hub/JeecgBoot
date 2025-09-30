@@ -15,11 +15,19 @@ public class DeviceResponse {
     private final String body;
     private final Charset charset;
 
+    private final String contentType;
+
+
     private DeviceResponse(Builder builder) {
         this.statusCode = builder.statusCode;
         this.headers = builder.headers == null ? Collections.emptyMap() : Collections.unmodifiableMap(builder.headers);
         this.body = builder.body == null ? "" : builder.body;
         this.charset = builder.charset == null ? StandardCharsets.UTF_8 : builder.charset;
+
+        this.contentType = builder.contentType == null
+                ? "text/plain; charset=" + this.charset.name()
+                : builder.contentType;
+
     }
 
     public int getStatusCode() {
@@ -38,6 +46,12 @@ public class DeviceResponse {
         return charset;
     }
 
+
+    public String getContentType() {
+        return contentType;
+    }
+
+
     public static Builder builder() {
         return new Builder();
     }
@@ -47,6 +61,9 @@ public class DeviceResponse {
         private Map<String, String> headers;
         private String body;
         private Charset charset;
+
+        private String contentType;
+
 
         private Builder() {
         }
@@ -71,8 +88,24 @@ public class DeviceResponse {
             return this;
         }
 
+
+        public Builder contentType(String contentType) {
+            this.contentType = contentType;
+            return this;
+        }
+
         public DeviceResponse build() {
             return new DeviceResponse(this);
         }
     }
+
+
+    public static DeviceResponse text(String body) {
+        return DeviceResponse.builder().body(body).build();
+    }
+
+    public static DeviceResponse text(int statusCode, String body) {
+        return DeviceResponse.builder().statusCode(statusCode).body(body).build();
+    }
+
 }

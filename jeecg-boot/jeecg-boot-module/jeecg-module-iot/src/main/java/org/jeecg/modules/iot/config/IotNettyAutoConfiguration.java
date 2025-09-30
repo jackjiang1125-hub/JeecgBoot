@@ -1,5 +1,15 @@
 package org.jeecg.modules.iot.config;
 
+
+import org.jeecg.modules.iot.acc.cache.AccDeviceRedisCache;
+import org.jeecg.modules.iot.acc.protocol.AccDeviceMessageProcessor;
+import org.jeecg.modules.iot.acc.service.AccDeviceCommandReportService;
+import org.jeecg.modules.iot.acc.service.AccDevicePhotoService;
+import org.jeecg.modules.iot.acc.service.AccDeviceRtLogService;
+import org.jeecg.modules.iot.acc.service.AccDeviceService;
+import org.jeecg.modules.iot.acc.service.AccDeviceStateService;
+import org.jeecg.modules.iot.server.IotNettyServer;
+import org.jeecg.modules.iot.server.IotNettyServerProperties;
 import org.jeecg.modules.iot.server.IotNettyServer;
 import org.jeecg.modules.iot.server.IotNettyServerProperties;
 import org.jeecg.modules.iot.service.DefaultDeviceMessageProcessor;
@@ -27,7 +37,13 @@ public class IotNettyAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public DeviceMessageProcessor deviceMessageProcessor() {
-        return new DefaultDeviceMessageProcessor();
+    public DeviceMessageProcessor deviceMessageProcessor(AccDeviceService accDeviceService,
+                                                         AccDeviceRtLogService accDeviceRtLogService,
+                                                         AccDeviceStateService accDeviceStateService,
+                                                         AccDevicePhotoService accDevicePhotoService,
+                                                         AccDeviceCommandReportService accDeviceCommandReportService,
+                                                         AccDeviceRedisCache accDeviceRedisCache) {
+        return new AccDeviceMessageProcessor(accDeviceService, accDeviceRtLogService, accDeviceStateService,
+                accDevicePhotoService, accDeviceCommandReportService, accDeviceRedisCache);
     }
 }
