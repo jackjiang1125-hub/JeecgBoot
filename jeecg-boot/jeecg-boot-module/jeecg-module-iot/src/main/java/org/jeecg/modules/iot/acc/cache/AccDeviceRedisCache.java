@@ -67,13 +67,19 @@ public class AccDeviceRedisCache {
         writeJson(key("heartbeat", sn), heartbeat, DEFAULT_TTL);
     }
 
+
     public List<QueuedCommand> drainCommands(String sn) {
         List<QueuedCommand> commands = new ArrayList<>();
+
+    public List<String> drainCommands(String sn) {
+        List<String> commands = new ArrayList<>();
+
         if (StringUtils.isBlank(sn)) {
             return commands;
         }
         String redisKey = key("commands", sn);
         for (int i = 0; i < MAX_COMMANDS_PER_HEARTBEAT; i++) {
+
             String payload = redisTemplate.opsForList().leftPop(redisKey);
             if (payload == null) {
                 break;
@@ -82,12 +88,14 @@ public class AccDeviceRedisCache {
             if (command != null) {
                 commands.add(command);
             }
+
         }
         if (commands.isEmpty()) {
             redisTemplate.expire(redisKey, DEFAULT_TTL);
         }
         return commands;
     }
+
 
     public void enqueueCommand(String sn, String commandId, String commandContent) {
         if (StringUtils.isAnyBlank(sn, commandId, commandContent)) {
@@ -111,6 +119,7 @@ public class AccDeviceRedisCache {
         return "iot:acc:" + category + ":" + sn;
     }
 
+
     /**
      * Value object used for queued commands in Redis.
      */
@@ -132,4 +141,5 @@ public class AccDeviceRedisCache {
             return new QueuedCommand(id, content);
         }
     }
+
 }

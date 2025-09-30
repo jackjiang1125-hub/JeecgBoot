@@ -110,6 +110,7 @@ CREATE TABLE IF NOT EXISTS iot_acc_device_command_report (
     KEY idx_acc_command_report_sn_time (sn, report_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Command execution feedback reported by devices';
 
+
 CREATE TABLE IF NOT EXISTS iot_acc_device_command (
     id                  varchar(32)  NOT NULL,
     create_by           varchar(64)  DEFAULT NULL,
@@ -131,3 +132,4 @@ CREATE TABLE IF NOT EXISTS iot_acc_device_command (
     KEY idx_acc_command_sn_status (sn, status),
     KEY idx_acc_command_enqueue (enqueue_time)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COMMENT='Commands queued for delivery to access control devices';
+

@@ -16,7 +16,9 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
+
 import java.util.UUID;
+
 
 /**
  * Default implementation for {@link AccDeviceService}.
@@ -140,6 +142,7 @@ public class AccDeviceServiceImpl extends JeecgServiceImpl<AccDeviceMapper, AccD
     private String generateRegistryCode() {
         return UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
     }
+
 
     private Integer parseInteger(String value, Integer defaultValue) {
         if (StringUtils.isBlank(value)) {

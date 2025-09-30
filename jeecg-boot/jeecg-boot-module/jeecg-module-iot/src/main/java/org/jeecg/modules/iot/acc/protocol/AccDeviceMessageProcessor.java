@@ -10,9 +10,11 @@ import org.jeecg.modules.iot.acc.entity.AccDevicePhoto;
 import org.jeecg.modules.iot.acc.entity.AccDeviceRtLog;
 import org.jeecg.modules.iot.acc.entity.AccDeviceState;
 import org.jeecg.modules.iot.acc.enums.AccDeviceStatus;
+
 import org.jeecg.modules.iot.acc.cache.AccDeviceRedisCache.QueuedCommand;
 import org.jeecg.modules.iot.acc.service.AccDeviceCommandReportService;
 import org.jeecg.modules.iot.acc.service.AccDeviceCommandService;
+import org.jeecg.modules.iot.acc.service.AccDeviceCommandReportService;
 import org.jeecg.modules.iot.acc.service.AccDevicePhotoService;
 import org.jeecg.modules.iot.acc.service.AccDeviceRtLogService;
 import org.jeecg.modules.iot.acc.service.AccDeviceService;
@@ -42,6 +44,7 @@ public class AccDeviceMessageProcessor implements DeviceMessageProcessor {
     private final AccDeviceStateService accDeviceStateService;
     private final AccDevicePhotoService accDevicePhotoService;
     private final AccDeviceCommandReportService accDeviceCommandReportService;
+
     private final AccDeviceCommandService accDeviceCommandService;
     private final AccDeviceRedisCache redisCache;
 
@@ -161,6 +164,7 @@ public class AccDeviceMessageProcessor implements DeviceMessageProcessor {
         LocalDateTime heartbeatTime = LocalDateTime.now();
         redisCache.recordHeartbeat(sn, message.getClientIp());
         accDeviceService.markHeartbeat(sn, message.getClientIp(), heartbeatTime);
+
         List<QueuedCommand> commands = redisCache.drainCommands(sn);
         if (commands.isEmpty()) {
             return DeviceResponse.text(OK);
@@ -168,6 +172,7 @@ public class AccDeviceMessageProcessor implements DeviceMessageProcessor {
         accDeviceCommandService.markCommandsSent(commands.stream().map(QueuedCommand::id)
                 .collect(Collectors.toList()), heartbeatTime);
         String body = commands.stream().map(QueuedCommand::content).collect(Collectors.joining("\n"));
+
         return DeviceResponse.text(body);
     }
 
@@ -178,10 +183,12 @@ public class AccDeviceMessageProcessor implements DeviceMessageProcessor {
         if (StringUtils.isBlank(sn)) {
             sn = firstValue(body, "sn");
         }
+
         String commandCode = firstValue(body, "CmdId", "ID", "cmdid");
         AccDeviceCommandReport report = new AccDeviceCommandReport();
         report.setSn(sn);
         report.setCommandId(commandCode);
+
         report.setCommandContent(StringUtils.defaultIfBlank(firstValue(body, "Cmd"), message.getPayload()));
         report.setResultCode(firstValue(body, "Result"));
         report.setResultMessage(firstValue(body, "Info"));
@@ -189,8 +196,10 @@ public class AccDeviceMessageProcessor implements DeviceMessageProcessor {
         report.setRawPayload(StringUtils.defaultIfBlank(message.getPayload(), message.getUri()));
         report.setClientIp(message.getClientIp());
         accDeviceCommandReportService.save(report);
+
         accDeviceCommandService.handleCommandReport(sn, commandCode, report.getResultCode(),
                 report.getResultMessage(), report.getRawPayload(), report.getClientIp());
+
         return DeviceResponse.text(OK);
     }
 

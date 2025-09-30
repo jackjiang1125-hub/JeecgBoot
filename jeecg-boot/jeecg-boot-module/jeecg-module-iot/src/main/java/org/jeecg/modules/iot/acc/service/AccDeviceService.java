@@ -25,5 +25,7 @@ public interface AccDeviceService extends JeecgService<AccDevice> {
 
     void updateStatus(String sn, AccDeviceStatus status, boolean authorized);
 
+
     Optional<AccDevice> authorizeDevice(String sn, String registryCode, String remark, String operator);
+
 }
