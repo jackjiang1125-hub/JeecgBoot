@@ -1,5 +1,6 @@
 package org.jeecg.modules.iot.config;
 
+
 import org.jeecg.modules.iot.acc.cache.AccDeviceRedisCache;
 import org.jeecg.modules.iot.acc.protocol.AccDeviceMessageProcessor;
 import org.jeecg.modules.iot.acc.service.AccDeviceCommandReportService;
@@ -9,6 +10,9 @@ import org.jeecg.modules.iot.acc.service.AccDeviceService;
 import org.jeecg.modules.iot.acc.service.AccDeviceStateService;
 import org.jeecg.modules.iot.server.IotNettyServer;
 import org.jeecg.modules.iot.server.IotNettyServerProperties;
+import org.jeecg.modules.iot.server.IotNettyServer;
+import org.jeecg.modules.iot.server.IotNettyServerProperties;
+import org.jeecg.modules.iot.service.DefaultDeviceMessageProcessor;
 import org.jeecg.modules.iot.service.DeviceMessageProcessor;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;

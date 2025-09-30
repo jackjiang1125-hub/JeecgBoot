@@ -10,7 +10,9 @@ import io.netty.handler.codec.http.HttpHeaderNames;
 import io.netty.handler.codec.http.HttpHeaderValues;
 import io.netty.handler.codec.http.HttpResponseStatus;
 import io.netty.handler.codec.http.HttpVersion;
+
 import io.netty.handler.codec.http.QueryStringDecoder;
+
 import io.netty.util.CharsetUtil;
 import org.jeecg.modules.iot.model.DeviceMessage;
 import org.jeecg.modules.iot.model.DeviceResponse;
@@ -22,6 +24,7 @@ import java.net.InetSocketAddress;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Collectors;
+
 
 /**
  * Netty channel handler that converts HTTP requests into {@link DeviceMessage} instances.
@@ -38,12 +41,15 @@ public class DeviceMessageHandler extends io.netty.channel.SimpleChannelInboundH
 
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, FullHttpRequest msg) {
+
         QueryStringDecoder decoder = new QueryStringDecoder(msg.uri());
+
         DeviceMessage message = DeviceMessage.builder()
                 .uri(msg.uri())
                 .method(msg.method().name())
                 .headers(extractHeaders(msg))
                 .payload(msg.content().toString(CharsetUtil.UTF_8))
+
                 .path(decoder.path())
                 .queryParameters(decoder.parameters().entrySet().stream()
                         .filter(entry -> !entry.getValue().isEmpty())
@@ -98,4 +104,5 @@ public class DeviceMessageHandler extends io.netty.channel.SimpleChannelInboundH
         }
         return "";
     }
+
 }

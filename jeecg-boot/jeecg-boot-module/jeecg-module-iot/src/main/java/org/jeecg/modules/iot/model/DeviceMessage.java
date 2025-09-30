@@ -12,22 +12,26 @@ public class DeviceMessage {
     private final String method;
     private final Map<String, String> headers;
     private final String payload;
+
     private final String path;
     private final Map<String, String> queryParameters;
     private final String clientIp;
     private final String contentType;
+
 
     private DeviceMessage(Builder builder) {
         this.uri = builder.uri;
         this.method = builder.method;
         this.headers = builder.headers == null ? Collections.emptyMap() : Collections.unmodifiableMap(builder.headers);
         this.payload = builder.payload;
+
         this.path = builder.path;
         this.queryParameters = builder.queryParameters == null
                 ? Collections.emptyMap()
                 : Collections.unmodifiableMap(builder.queryParameters);
         this.clientIp = builder.clientIp;
         this.contentType = builder.contentType;
+
     }
 
     public String getUri() {
@@ -46,6 +50,7 @@ public class DeviceMessage {
         return payload;
     }
 
+
     public String getPath() {
         return path;
     }
@@ -62,6 +67,7 @@ public class DeviceMessage {
         return contentType;
     }
 
+
     public static Builder builder() {
         return new Builder();
     }
@@ -71,10 +77,12 @@ public class DeviceMessage {
         private String method;
         private Map<String, String> headers;
         private String payload;
+
         private String path;
         private Map<String, String> queryParameters;
         private String clientIp;
         private String contentType;
+
 
         private Builder() {
         }
@@ -99,6 +107,7 @@ public class DeviceMessage {
             return this;
         }
 
+
         public Builder path(String path) {
             this.path = path;
             return this;
@@ -118,6 +127,7 @@ public class DeviceMessage {
             this.contentType = contentType;
             return this;
         }
+
 
         public DeviceMessage build() {
             return new DeviceMessage(this);
