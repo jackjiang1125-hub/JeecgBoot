@@ -17,6 +17,9 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.Optional;
 
+import java.util.UUID;
+
+
 /**
  * Default implementation for {@link AccDeviceService}.
  */
@@ -119,6 +122,27 @@ public class AccDeviceServiceImpl extends JeecgServiceImpl<AccDeviceMapper, AccD
             updateById(device);
         });
     }
+
+    @Override
+    @Transactional(rollbackFor = Exception.class)
+    public Optional<AccDevice> authorizeDevice(String sn, String registryCode, String remark, String operator) {
+        Optional<AccDevice> optional = findBySn(sn);
+        optional.ifPresent(device -> {
+            device.setStatus(AccDeviceStatus.AUTHORIZED);
+            device.setAuthorized(Boolean.TRUE);
+            device.setRegistryCode(StringUtils.defaultIfBlank(registryCode, generateRegistryCode()));
+            device.setRemark(StringUtils.defaultIfBlank(remark, device.getRemark()));
+            device.setUpdateBy(operator);
+            device.setUpdateTime(new java.util.Date());
+            updateById(device);
+        });
+        return optional;
+    }
+
+    private String generateRegistryCode() {
+        return UUID.randomUUID().toString().replaceAll("-", "").toUpperCase();
+    }
+
 
     private Integer parseInteger(String value, Integer defaultValue) {
         if (StringUtils.isBlank(value)) {

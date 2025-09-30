@@ -24,4 +24,8 @@ public interface AccDeviceService extends JeecgService<AccDevice> {
     void markHeartbeat(String sn, String clientIp, LocalDateTime heartbeatTime);
 
     void updateStatus(String sn, AccDeviceStatus status, boolean authorized);
+
+
+    Optional<AccDevice> authorizeDevice(String sn, String registryCode, String remark, String operator);
+
 }

@@ -67,18 +67,28 @@ public class AccDeviceRedisCache {
         writeJson(key("heartbeat", sn), heartbeat, DEFAULT_TTL);
     }
 
+
+    public List<QueuedCommand> drainCommands(String sn) {
+        List<QueuedCommand> commands = new ArrayList<>();
+
     public List<String> drainCommands(String sn) {
         List<String> commands = new ArrayList<>();
+
         if (StringUtils.isBlank(sn)) {
             return commands;
         }
         String redisKey = key("commands", sn);
         for (int i = 0; i < MAX_COMMANDS_PER_HEARTBEAT; i++) {
-            String cmd = redisTemplate.opsForList().leftPop(redisKey);
-            if (cmd == null) {
+
+            String payload = redisTemplate.opsForList().leftPop(redisKey);
+            if (payload == null) {
                 break;
             }
-            commands.add(cmd);
+            QueuedCommand command = QueuedCommand.fromPayload(payload);
+            if (command != null) {
+                commands.add(command);
+            }
+
         }
         if (commands.isEmpty()) {
             redisTemplate.expire(redisKey, DEFAULT_TTL);
@@ -86,12 +96,13 @@ public class AccDeviceRedisCache {
         return commands;
     }
 
-    public void enqueueCommand(String sn, String command) {
-        if (StringUtils.isAnyBlank(sn, command)) {
+
+    public void enqueueCommand(String sn, String commandId, String commandContent) {
+        if (StringUtils.isAnyBlank(sn, commandId, commandContent)) {
             return;
         }
         String redisKey = key("commands", sn);
-        redisTemplate.opsForList().rightPush(redisKey, command);
+        redisTemplate.opsForList().rightPush(redisKey, commandId + "|" + commandContent);
         redisTemplate.expire(redisKey, DEFAULT_TTL);
     }
 
@@ -107,4 +118,28 @@ public class AccDeviceRedisCache {
     private String key(String category, String sn) {
         return "iot:acc:" + category + ":" + sn;
     }
+
+
+    /**
+     * Value object used for queued commands in Redis.
+     */
+    public record QueuedCommand(String id, String content) {
+
+        private static QueuedCommand fromPayload(String payload) {
+            if (StringUtils.isBlank(payload)) {
+                return null;
+            }
+            int idx = payload.indexOf('|');
+            if (idx <= 0 || idx >= payload.length() - 1) {
+                return null;
+            }
+            String id = payload.substring(0, idx);
+            String content = payload.substring(idx + 1);
+            if (StringUtils.isAnyBlank(id, content)) {
+                return null;
+            }
+            return new QueuedCommand(id, content);
+        }
+    }
+
 }
